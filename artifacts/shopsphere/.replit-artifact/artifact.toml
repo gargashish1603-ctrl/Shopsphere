@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "ShopSphere Marketplace"
+description = "A production-quality peer-to-peer marketplace prototype where people can discover, buy, sell, and manage products, orders, and marketplace operations with mock data and AWS-ready service boundaries."
+version = "1.0.0"
+id = "artifacts/shopsphere"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19540
+
+[services.development]
+run = "pnpm --filter @workspace/shopsphere run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/shopsphere", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/shopsphere/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19540"
+BASE_PATH = "/"

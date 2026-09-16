@@ -1,10 +1,11 @@
-# [Project name]
+# ShopSphere
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+ShopSphere is a responsive peer-to-peer marketplace prototype where people can buy, sell, discover, and manage products using local mock data.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/shopsphere run dev` — run the ShopSphere web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -22,23 +23,30 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/shopsphere/src/App.tsx` — routes, shared shell, pages, and marketplace UI
+- `artifacts/shopsphere/src/contexts/MarketplaceContext.tsx` — auth, cart, wishlist, marketplace state, and toast behavior
+- `artifacts/shopsphere/src/services/mockStore.ts` — localStorage-backed mock data/services and seed data
+- `artifacts/shopsphere/src/index.css` — ShopSphere design tokens and responsive styles
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first release is frontend-only and uses localStorage-backed adapters so buying, selling, order management, and admin moderation work without AWS credentials.
+- User accounts, cart, wishlist, products, orders, categories, and analytics are accessed through context/service boundaries rather than direct component storage calls.
+- Mock auth supports a normal user and an admin; frontend route guards are UX protection only and must be replaced with backend authorization when AWS Cognito/API Gateway is connected.
+- Product images use reliable public image URLs with local preview support for seller-created listings.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+ShopSphere includes marketplace discovery, multi-filter search and sorting, product details, favorites, cart and demo checkout, order tracking, seller listing management, received orders, admin moderation, category management, analytics readiness, and settings.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+No additional preferences recorded.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The web build expects `PORT` and `BASE_PATH` from the managed workflow; standalone builds need those values supplied explicitly.
+- This is demo auth and demo payment only; no AWS credentials, Cognito pool, real gateway, or production authorization is configured.
 
 ## Pointers
 
