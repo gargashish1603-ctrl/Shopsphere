@@ -105,7 +105,7 @@ def run_seed():
             "Calculators",
             "New",
             "Malleshwaram, Bengaluru",
-            json.dumps(["https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80"]),
+            json.dumps(["/images/casio-fx-991cw.jpg"]),
             "u-seller-priya",
             "EduTech & Stationery Hub (Priya Sharma)",
             "active",
@@ -113,7 +113,7 @@ def run_seed():
             "Casio FX-991CW ClassWiz Scientific Calculator",
             18,
             "Casio",
-            "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80",
+            "/images/casio-fx-991cw.jpg",
             4.9,
             24
         ),
@@ -168,7 +168,7 @@ def run_seed():
             "Pens & Stationery",
             "New",
             "Malleshwaram, Bengaluru",
-            json.dumps(["https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80"]),
+            json.dumps(["/images/uniball-air-micro.jpg"]),
             "u-seller-priya",
             "EduTech & Stationery Hub (Priya Sharma)",
             "active",
@@ -176,7 +176,7 @@ def run_seed():
             "Uni-ball Air Micro 0.5mm Rollerball Pen Pack (5 Pens)",
             40,
             "Uni-ball",
-            "https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80",
+            "/images/uniball-air-micro.jpg",
             4.7,
             52
         ),
@@ -338,7 +338,7 @@ def run_seed():
                 {
                     "productId": "prod-casio-991cw",
                     "name": "Casio FX-991CW ClassWiz Scientific Calculator",
-                    "image": "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80",
+                    "image": "/images/casio-fx-991cw.jpg",
                     "price": 1595.0,
                     "quantity": 1
                 },
@@ -410,7 +410,7 @@ def run_seed():
                 {
                     "productId": "prod-uniball-air",
                     "name": "Uni-ball Air Micro 0.5mm Rollerball Pen Pack (5 Pens)",
-                    "image": "https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80",
+                    "image": "/images/uniball-air-micro.jpg",
                     "price": 450.0,
                     "quantity": 1
                 }

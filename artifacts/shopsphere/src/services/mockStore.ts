@@ -46,7 +46,7 @@ export const seedProducts: Product[] = [
     stock: 18,
     condition: 'New',
     brand: 'Casio',
-    image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80',
+    image: '/images/casio-fx-991cw.jpg',
     sellerId: 'u-seller-priya',
     sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
     rating: 4.9,
@@ -97,7 +97,7 @@ export const seedProducts: Product[] = [
     stock: 40,
     condition: 'New',
     brand: 'Uni-ball',
-    image: 'https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80',
+    image: '/images/uniball-air-micro.jpg',
     sellerId: 'u-seller-priya',
     sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
     rating: 4.7,
@@ -220,7 +220,7 @@ export const seedOrders: Order[] = [
       {
         productId: 'prod-casio-991cw',
         name: 'Casio FX-991CW ClassWiz Scientific Calculator',
-        image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80',
+        image: '/images/casio-fx-991cw.jpg',
         price: 1595,
         quantity: 1
       },
@@ -286,7 +286,7 @@ export const seedOrders: Order[] = [
       {
         productId: 'prod-uniball-air',
         name: 'Uni-ball Air Micro 0.5mm Rollerball Pen Pack (5 Pens)',
-        image: 'https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80',
+        image: '/images/uniball-air-micro.jpg',
         price: 450,
         quantity: 1
       }
