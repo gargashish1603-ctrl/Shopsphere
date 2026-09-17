@@ -6,7 +6,7 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from database import get_db
-
+#.....
 SECRET_KEY = os.getenv("JWT_SECRET", "shopsphere-marketplace-jwt-secret-key-32-bytes-secure-2026")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
