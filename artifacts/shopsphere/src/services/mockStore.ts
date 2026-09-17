@@ -1,4 +1,4 @@
-export type Role = 'user' | 'admin';
+export type Role = 'user' | 'buyer' | 'seller' | 'admin';
 export type UserStatus = 'active' | 'suspended';
 export type ProductStatus = 'active' | 'pending' | 'rejected' | 'out_of_stock';
 export type OrderStatus = 'placed' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
@@ -10,13 +10,14 @@ export interface User {
 export interface Product {
   id: string; name: string; description: string; category: string; price: number;
   stock: number; condition: 'New' | 'Used'; brand?: string; image: string;
+  images?: string[];
   sellerId: string; sellerName: string; rating: number; reviewCount: number;
   status: ProductStatus; createdAt: string;
 }
 export interface CartItem { productId: string; quantity: number; }
 export interface OrderItem { productId: string; name: string; image: string; price: number; quantity: number; }
 export interface Order {
-  id: string; buyerId: string; items: OrderItem[]; totalAmount: number;
+  id: string; buyerId: string; buyerName?: string; items: OrderItem[]; totalAmount: number;
   shippingAddress: string; paymentMethod: string; status: OrderStatus; createdAt: string;
 }
 export interface Review {
@@ -24,90 +25,369 @@ export interface Review {
 }
 export interface Category { id: string; name: string; count: number; }
 
-const images = [
-  'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=900',
-  'https://images.pexels.com/photos/3945653/pexels-photo-3945653.jpeg?auto=compress&cs=tinysrgb&w=900',
-  'https://images.pexels.com/photos/9095/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=900',
-  'https://images.pexels.com/photos/631157/pexels-photo-631157.jpeg?auto=compress&cs=tinysrgb&w=900',
-  'https://images.pexels.com/photos/15927879/pexels-photo-15927879.jpeg?auto=compress&cs=tinysrgb&w=900',
-  'https://images.pexels.com/photos/5709661/pexels-photo-5709661.jpeg?auto=compress&cs=tinysrgb&w=900',
-];
-const now = new Date();
-const ago = (days: number) => new Date(now.getTime() - days * 86400000).toISOString();
-const sellers = ['Aarav Studio', 'Mira Finds', 'The Reading Room', 'Namma Home', 'Kite & Loom', 'Blue Door Collective'];
-const names = ['Aditi Rao', 'Kabir Mehta', 'Neha Iyer', 'Rohan Shah', 'Ishita Sen', 'Vikram Das', 'Tara Nair', 'Arjun Kapoor', 'Meera Joshi', 'Dev Malhotra'];
-const productSeeds: [string, string, number, string, string][] = [
-  ['Nothing Phone (2a) 5G', 'Electronics', 23999, 'Nothing', 'A clean, fast phone with a remarkably thoughtful interface.'],
-  ['Sony WH-1000XM5 Headphones', 'Electronics', 24990, 'Sony', 'Immersive noise cancelling for focus, flights, and slow Sundays.'],
-  ['Kindle Paperwhite 11th Gen', 'Electronics', 11999, 'Amazon', 'Warm light and weeks of reading in a pocket-sized screen.'],
-  ['JBL Flip 6 Portable Speaker', 'Electronics', 8999, 'JBL', 'Room-filling sound in a compact, splash-proof body.'],
-  ['Logitech MX Mechanical Mini', 'Electronics', 10995, 'Logitech', 'Tactile low-profile keys for long, happy work sessions.'],
-  ['Fujifilm Instax Mini 12', 'Electronics', 7999, 'Fujifilm', 'Point, shoot, and keep the little moments tangible.'],
-  ['Handwoven Kala Cotton Overshirt', 'Fashion', 1850, 'Kite & Loom', 'Breathable handloom cotton, cut for an easy everyday fit.'],
-  ['Indigo Block Print Dress', 'Fashion', 2450, 'Mira Finds', 'A relaxed silhouette with a hand-stamped indigo story.'],
-  ['Leather Crossbody Satchel', 'Fashion', 3200, 'Aarav Studio', 'Vegetable-tanned leather that gets better with every city.'],
-  ['Khadi Camp Collar Shirt', 'Fashion', 1790, 'Kite & Loom', 'Soft khadi with a modern, unfussy camp collar.'],
-  ['Canvas Everyday Tote', 'Fashion', 780, 'Blue Door Collective', 'A sturdy, screen-printed carry-all for market mornings.'],
-  ['Silver Filigree Studs', 'Fashion', 1250, 'Mira Finds', 'Hand-finished silver studs with a quiet glint.'],
-  ['The God of Small Things', 'Books', 399, 'The Reading Room', 'A much-loved paperback in excellent reading condition.'],
-  ['A Suitable Boy', 'Books', 520, 'The Reading Room', 'An expansive, engrossing family saga for unhurried weekends.'],
-  ['The Art of Indian Cuisine', 'Books', 950, 'Namma Home', 'Regional recipes, pantry notes, and stories worth cooking.'],
-  ['Atomic Habits', 'Books', 499, 'The Reading Room', 'A practical, annotated copy for building better rhythms.'],
-  ['The Blue Umbrella', 'Books', 220, 'The Reading Room', 'Ruskin Bond’s pocket-sized mountain classic.'],
-  ['Pachinko', 'Books', 599, 'The Reading Room', 'A sweeping family story, softly read and ready for a new home.'],
-  ['Terracotta Table Lamp', 'Home', 2200, 'Namma Home', 'A warm, sculptural glow shaped by a Jaipur ceramicist.'],
-  ['Linen Cushion Cover Set', 'Home', 1150, 'Namma Home', 'Two naturally dyed covers to soften a favourite corner.'],
-  ['Brass Lotus Diya', 'Home', 680, 'Aarav Studio', 'A cast brass diya made for slow evening rituals.'],
-  ['Rattan Storage Basket', 'Home', 1450, 'Blue Door Collective', 'Handwoven storage with a generous, light-filled silhouette.'],
-  ['Marble Serving Board', 'Home', 1800, 'Namma Home', 'Cool white marble with a simple teak handle.'],
-  ['Monsoon Tea Set', 'Home', 2400, 'Namma Home', 'Six ceramic cups designed for long conversations.'],
-  ['Mysore Yoga Mat', 'Sports', 1499, 'Blue Door Collective', 'A grippy, generous mat for gentle or ambitious practice.'],
-  ['Decathlon Road Cycling Helmet', 'Sports', 2650, 'Aarav Studio', 'Lightweight protection with an airy fit.'],
-  ['Resistance Band Set', 'Sports', 899, 'Blue Door Collective', 'Five strengths for a practical home workout kit.'],
-  ['Handstitched Cricket Ball', 'Sports', 620, 'Aarav Studio', 'A durable red leather ball for serious laneside games.'],
-  ['Trek Daypack 20L', 'Sports', 2199, 'Kite & Loom', 'A weather-ready daypack for short trails and longer commutes.'],
-  ['Bamboo Desk Organiser', 'Other', 550, 'Namma Home', 'A neat little landing place for cables, cards, and pens.'],
-  ['Artisan Coffee Sampler', 'Other', 890, 'Mira Finds', 'Three small-batch Indian roasts, each with a different mood.'],
-  ['Handpainted Ceramic Vase', 'Other', 1350, 'Namma Home', 'An imperfect, one-off shape for one beautiful stem.'],
-];
+const now = new Date().toISOString();
 
 export const seedUsers: User[] = [
-  { id: 'u-admin', name: 'ShopSphere Admin', email: 'admin@shopsphere.com', role: 'admin', status: 'active', createdAt: ago(420), password: 'Admin123!' },
-  { id: 'u-demo', name: 'Priya Menon', email: 'user@shopsphere.com', phone: '+91 98765 43210', address: '14, 2nd Cross, Indiranagar, Bengaluru 560038', role: 'user', status: 'active', createdAt: ago(100), password: 'User123!' },
-  ...names.map((name, i) => ({ id: `u-${i + 2}`, name, email: `${name.toLowerCase().replace(' ', '.')}@mail.com`, role: 'user' as Role, status: (i === 5 ? 'suspended' : 'active') as UserStatus, createdAt: ago(30 + i * 15), password: 'Welcome1!' })),
+  { id: 'u-admin', name: 'ShopSphere Admin', email: 'admin@shopsphere.com', role: 'admin', status: 'active', createdAt: now, password: 'Admin123!' },
+  { id: 'u-seller-priya', name: 'Priya Sharma', email: 'priya.seller@shopsphere.com', role: 'seller', status: 'active', createdAt: now, password: 'Seller123!', phone: '+91 98112 34567', address: 'Shop 14, Brigade Gateway Campus, Malleshwaram, Bengaluru 560055' },
+  { id: 'u-seller-rohan', name: 'Rohan Verma', email: 'rohan.seller@shopsphere.com', role: 'seller', status: 'active', createdAt: now, password: 'Seller123!', phone: '+91 97420 67890', address: 'Studio 204, Powai Tech Quarter, Mumbai 400076' },
+  { id: 'u-buyer-aarav', name: 'Aarav Mehta', email: 'aarav.mehta@gmail.com', role: 'buyer', status: 'active', createdAt: now, password: 'Buyer123!', phone: '+91 98201 44552', address: 'Flat 402, Sunshine Residency, HSR Layout Sector 2, Bengaluru 560102' },
+  { id: 'u-buyer-sneha', name: 'Sneha Kulkarni', email: 'sneha.kulkarni@gmail.com', role: 'buyer', status: 'active', createdAt: now, password: 'Buyer123!', phone: '+91 98450 11223', address: 'B-12, Green Glen Layout, Bellandur, Bengaluru 560103' },
+  { id: 'u-buyer-vikram', name: 'Vikramaditya Rao', email: 'vikram.rao@gmail.com', role: 'buyer', status: 'active', createdAt: now, password: 'Buyer123!', phone: '+91 99002 88991', address: 'Penthouse 8A, Prestige Shantiniketan, Whitefield, Bengaluru 560066' },
 ];
 
-export const seedProducts: Product[] = productSeeds.map(([name, category, price, brand, description], i) => ({
-  id: `p-${i + 1}`, name, category, price, brand, description, stock: i === 7 ? 0 : 4 + (i * 3) % 19,
-  condition: i % 7 === 0 ? 'Used' : 'New', image: images[i % images.length], sellerId: i < 5 ? 'u-demo' : `u-${(i % 6) + 2}`,
-  sellerName: i < 5 ? 'Priya Menon' : sellers[i % sellers.length], rating: Number((4.1 + (i % 9) / 10).toFixed(1)), reviewCount: 6 + (i * 7) % 42,
-  status: i === 7 ? 'out_of_stock' : 'active', createdAt: ago(i + 1),
-}));
+export const seedProducts: Product[] = [
+  {
+    id: 'prod-casio-991cw',
+    name: 'Casio FX-991CW ClassWiz Scientific Calculator',
+    description: '540+ functions, quad-color natural textbook display, QR code equation visualization, and dual solar/battery power. Approved for CBSE, JEE, and University examinations.',
+    category: 'Calculators',
+    price: 1595,
+    stock: 18,
+    condition: 'New',
+    brand: 'Casio',
+    image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-priya',
+    sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
+    rating: 4.9,
+    reviewCount: 24,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-ti-30xs',
+    name: 'Texas Instruments TI-30XS MultiView Scientific Calculator',
+    description: 'MultiView 4-line display showing simultaneous calculations and fraction-decimal conversions. Ergonomic non-slip grips and durable slide-on protective hard case.',
+    category: 'Calculators',
+    price: 2150,
+    stock: 12,
+    condition: 'New',
+    brand: 'Texas Instruments',
+    image: 'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-priya',
+    sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
+    rating: 4.8,
+    reviewCount: 16,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-parker-frontier',
+    name: 'Parker Frontier Matte Black Fountain Pen (Gold Trim)',
+    description: 'Iconic matte black epoxy resin finish with 23K gold plated trims. Precision-engineered stainless steel medium nib with twin-channel ink feed for effortless, fatigue-free note-taking.',
+    category: 'Pens & Stationery',
+    price: 899,
+    stock: 25,
+    condition: 'New',
+    brand: 'Parker',
+    image: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-priya',
+    sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
+    rating: 4.9,
+    reviewCount: 38,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-uniball-air',
+    name: 'Uni-ball Air Micro 0.5mm Rollerball Pen Pack (5 Pens)',
+    description: 'Pressure-sensitive tip adapts to your writing angle. Fade-proof, tamper-proof and waterproof Super Ink formulation that doesn\'t bleed through student notebook pages.',
+    category: 'Pens & Stationery',
+    price: 450,
+    stock: 40,
+    condition: 'New',
+    brand: 'Uni-ball',
+    image: 'https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-priya',
+    sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
+    rating: 4.7,
+    reviewCount: 52,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-classmate-pulse',
+    name: 'Classmate Pulse Hardbound Spiral Notebook (300 Pages)',
+    description: 'Single line ruling, 70 GSM archival acid-free paper, perforated tear-off sheets, snag-free double spiral wire binding, and water-resistant protective poly cover.',
+    category: 'Notebooks',
+    price: 260,
+    stock: 50,
+    condition: 'New',
+    brand: 'Classmate',
+    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-priya',
+    sellerName: 'EduTech & Stationery Hub (Priya Sharma)',
+    rating: 4.8,
+    reviewCount: 64,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-rhodia-webbie',
+    name: 'Rhodia Webnotebook A5 Dot Grid Journal (Clairefontaine Vellum)',
+    description: 'Italian leatherette hardcover with embossed logo, expanding inner pocket, ribbon marker, and elastic closure. Super-smooth 90 GSM fountain pen friendly paper with zero feathering.',
+    category: 'Notebooks',
+    price: 1299,
+    stock: 15,
+    condition: 'New',
+    brand: 'Rhodia',
+    image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-rohan',
+    sellerName: 'Lumina Study & Living Co. (Rohan Verma)',
+    rating: 5.0,
+    reviewCount: 19,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-philips-led-desk',
+    name: 'Philips EyeCare Smart LED Study Table Lamp (Touch Dimmer)',
+    description: 'Flicker-free CRI 95+ light with 5 color temperatures (2700K warm white to 6500K daylight study). Flexible 360-degree silicone gooseneck and integrated 10W fast USB device charger.',
+    category: 'Table Lamps',
+    price: 2499,
+    stock: 14,
+    condition: 'New',
+    brand: 'Philips',
+    image: 'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-rohan',
+    sellerName: 'Lumina Study & Living Co. (Rohan Verma)',
+    rating: 4.9,
+    reviewCount: 41,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-nordic-wood-lamp',
+    name: 'Nordic Solid Beechwood Reading Table Lamp with Fabric Shade',
+    description: 'Handcrafted solid beechwood base with natural oatmeal linen lampshade. Provides soft, diffused ambient lighting ideal for late-night study sessions and dorm bedrooms.',
+    category: 'Table Lamps',
+    price: 1850,
+    stock: 9,
+    condition: 'New',
+    brand: 'Nordic Living',
+    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-rohan',
+    sellerName: 'Lumina Study & Living Co. (Rohan Verma)',
+    rating: 4.7,
+    reviewCount: 15,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-braun-digital-clock',
+    name: 'Braun Classic Digital Voice-Activated Alarm Clock (Temp Display)',
+    description: 'High-contrast negative LCD screen with indoor temperature sensor, date display, crescendo alarm sound, integrated backlight snooze function, and quiet precision quartz circuitry.',
+    category: 'Alarm Clocks',
+    price: 1750,
+    stock: 20,
+    condition: 'New',
+    brand: 'Braun',
+    image: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-rohan',
+    sellerName: 'Lumina Study & Living Co. (Rohan Verma)',
+    rating: 4.8,
+    reviewCount: 28,
+    status: 'active',
+    createdAt: now,
+  },
+  {
+    id: 'prod-sunrise-wake-clock',
+    name: 'Aesthetic Sunrise Wake-Up Light & Digital Alarm Clock (FM Radio)',
+    description: 'Simulates natural 30-minute gradual sunrise to gently wake you up refreshed. 7 soothing nature sounds, dual alarms, tap-to-snooze, and ambient multi-color bedside lamp.',
+    category: 'Alarm Clocks',
+    price: 3200,
+    stock: 11,
+    condition: 'New',
+    brand: 'Lumina',
+    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    sellerId: 'u-seller-rohan',
+    sellerName: 'Lumina Study & Living Co. (Rohan Verma)',
+    rating: 4.9,
+    reviewCount: 33,
+    status: 'active',
+    createdAt: now,
+  }
+];
 
-export const seedReviews: Review[] = Array.from({ length: 20 }, (_, i) => ({
-  id: `r-${i + 1}`, productId: `p-${(i % 12) + 1}`, userId: `u-${(i % 9) + 2}`, userName: names[i % names.length],
-  rating: 4 + (i % 2), comment: ['Arrived beautifully packed and exactly as described.', 'The seller was kind, quick, and thoughtful.', 'A genuinely great find. I use it every day.', 'Lovely quality, would happily shop here again.'][i % 4], createdAt: ago(i + 2),
-}));
+export const seedReviews: Review[] = [];
 
-export const seedOrders: Order[] = Array.from({ length: 15 }, (_, i) => {
-  const product = seedProducts[i % seedProducts.length];
-  const quantity = (i % 3) + 1;
-  return {
-    id: `ord-${String(1048 - i).padStart(4, '0')}`, buyerId: i % 4 === 0 ? 'u-demo' : `u-${(i % 8) + 2}`,
-    items: [{ productId: product.id, name: product.name, image: product.image, price: product.price, quantity }],
-    totalAmount: product.price * quantity + 80, shippingAddress: '14, 2nd Cross, Indiranagar, Bengaluru 560038',
-    paymentMethod: i % 2 ? 'UPI' : 'Card ending 42', status: (['delivered', 'shipped', 'packed', 'placed', 'cancelled'] as OrderStatus[])[i % 5], createdAt: ago(i * 2 + 3),
-  };
-});
+export const seedOrders: Order[] = [
+  {
+    id: 'ord-1092a1',
+    buyerId: 'u-buyer-aarav',
+    buyerName: 'Aarav Mehta',
+    items: [
+      {
+        productId: 'prod-casio-991cw',
+        name: 'Casio FX-991CW ClassWiz Scientific Calculator',
+        image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=800&auto=format&fit=crop&q=80',
+        price: 1595,
+        quantity: 1
+      },
+      {
+        productId: 'prod-classmate-pulse',
+        name: 'Classmate Pulse Hardbound Spiral Notebook (300 Pages)',
+        image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=80',
+        price: 260,
+        quantity: 2
+      }
+    ],
+    totalAmount: 2115,
+    shippingAddress: 'Flat 402, Sunshine Residency, HSR Layout Sector 2, Bengaluru 560102',
+    paymentMethod: 'UPI (Google Pay)',
+    status: 'delivered',
+    createdAt: now
+  },
+  {
+    id: 'ord-2041b3',
+    buyerId: 'u-buyer-aarav',
+    buyerName: 'Aarav Mehta',
+    items: [
+      {
+        productId: 'prod-philips-led-desk',
+        name: 'Philips EyeCare Smart LED Study Table Lamp (Touch Dimmer)',
+        image: 'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=800&auto=format&fit=crop&q=80',
+        price: 2499,
+        quantity: 1
+      },
+      {
+        productId: 'prod-braun-digital-clock',
+        name: 'Braun Classic Digital Voice-Activated Alarm Clock (Temp Display)',
+        image: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&auto=format&fit=crop&q=80',
+        price: 1750,
+        quantity: 1
+      }
+    ],
+    totalAmount: 4249,
+    shippingAddress: 'Flat 402, Sunshine Residency, HSR Layout Sector 2, Bengaluru 560102',
+    paymentMethod: 'Credit Card',
+    status: 'shipped',
+    createdAt: now
+  },
+  {
+    id: 'ord-3055c8',
+    buyerId: 'u-buyer-sneha',
+    buyerName: 'Sneha Kulkarni',
+    items: [
+      {
+        productId: 'prod-parker-frontier',
+        name: 'Parker Frontier Matte Black Fountain Pen (Gold Trim)',
+        image: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=800&auto=format&fit=crop&q=80',
+        price: 899,
+        quantity: 1
+      },
+      {
+        productId: 'prod-rhodia-webbie',
+        name: 'Rhodia Webnotebook A5 Dot Grid Journal (Clairefontaine Vellum)',
+        image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&auto=format&fit=crop&q=80',
+        price: 1299,
+        quantity: 1
+      },
+      {
+        productId: 'prod-uniball-air',
+        name: 'Uni-ball Air Micro 0.5mm Rollerball Pen Pack (5 Pens)',
+        image: 'https://images.unsplash.com/photo-1585336261026-78b1767c2957?w=800&auto=format&fit=crop&q=80',
+        price: 450,
+        quantity: 1
+      }
+    ],
+    totalAmount: 2648,
+    shippingAddress: 'B-12, Green Glen Layout, Bellandur, Bengaluru 560103',
+    paymentMethod: 'UPI (PhonePe)',
+    status: 'delivered',
+    createdAt: now
+  },
+  {
+    id: 'ord-4019d4',
+    buyerId: 'u-buyer-sneha',
+    buyerName: 'Sneha Kulkarni',
+    items: [
+      {
+        productId: 'prod-sunrise-wake-clock',
+        name: 'Aesthetic Sunrise Wake-Up Light & Digital Alarm Clock (FM Radio)',
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+        price: 3200,
+        quantity: 1
+      }
+    ],
+    totalAmount: 3200,
+    shippingAddress: 'B-12, Green Glen Layout, Bellandur, Bengaluru 560103',
+    paymentMethod: 'NetBanking',
+    status: 'packed',
+    createdAt: now
+  },
+  {
+    id: 'ord-5077e6',
+    buyerId: 'u-buyer-vikram',
+    buyerName: 'Vikramaditya Rao',
+    items: [
+      {
+        productId: 'prod-ti-30xs',
+        name: 'Texas Instruments TI-30XS MultiView Scientific Calculator',
+        image: 'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=800&auto=format&fit=crop&q=80',
+        price: 2150,
+        quantity: 1
+      },
+      {
+        productId: 'prod-parker-frontier',
+        name: 'Parker Frontier Matte Black Fountain Pen (Gold Trim)',
+        image: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=800&auto=format&fit=crop&q=80',
+        price: 899,
+        quantity: 2
+      }
+    ],
+    totalAmount: 3948,
+    shippingAddress: 'Penthouse 8A, Prestige Shantiniketan, Whitefield, Bengaluru 560066',
+    paymentMethod: 'Cash on Delivery',
+    status: 'placed',
+    createdAt: now
+  },
+  {
+    id: 'ord-6088f9',
+    buyerId: 'u-buyer-vikram',
+    buyerName: 'Vikramaditya Rao',
+    items: [
+      {
+        productId: 'prod-nordic-wood-lamp',
+        name: 'Nordic Solid Beechwood Reading Table Lamp with Fabric Shade',
+        image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=80',
+        price: 1850,
+        quantity: 1
+      },
+      {
+        productId: 'prod-braun-digital-clock',
+        name: 'Braun Classic Digital Voice-Activated Alarm Clock (Temp Display)',
+        image: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&auto=format&fit=crop&q=80',
+        price: 1750,
+        quantity: 1
+      }
+    ],
+    totalAmount: 3600,
+    shippingAddress: 'Penthouse 8A, Prestige Shantiniketan, Whitefield, Bengaluru 560066',
+    paymentMethod: 'UPI (Paytm)',
+    status: 'shipped',
+    createdAt: now
+  }
+];
 
-export const seedCategories: Category[] = ['Electronics', 'Fashion', 'Books', 'Home', 'Sports', 'Other'].map((name, i) => ({
-  id: `cat-${i + 1}`, name, count: seedProducts.filter((p) => p.category === name).length,
-}));
+export const seedCategories: Category[] = [
+  { id: 'cat-1', name: 'Calculators', count: 2 },
+  { id: 'cat-2', name: 'Pens & Stationery', count: 2 },
+  { id: 'cat-3', name: 'Notebooks', count: 2 },
+  { id: 'cat-4', name: 'Table Lamps', count: 2 },
+  { id: 'cat-5', name: 'Alarm Clocks', count: 2 },
+];
 
 export const readStore = <T,>(key: string, fallback: T): T => {
-  try { const raw = localStorage.getItem(`shopsphere:${key}`); return raw ? JSON.parse(raw) as T : fallback; } catch { return fallback; }
+  try {
+    const raw = localStorage.getItem(`shopsphere_v2:${key}`);
+    return raw ? JSON.parse(raw) as T : fallback;
+  } catch {
+    return fallback;
+  }
 };
-export const writeStore = (key: string, value: unknown) => localStorage.setItem(`shopsphere:${key}`, JSON.stringify(value));
+export const writeStore = (key: string, value: unknown) =>
+  localStorage.setItem(`shopsphere_v2:${key}`, JSON.stringify(value));
 
 export const productService = {
   list: () => readStore<Product[]>('products', seedProducts),
@@ -121,7 +401,9 @@ export const userService = {
   list: () => readStore<User[]>('users', seedUsers),
   save: (users: User[]) => writeStore('users', users),
 };
-export const reviewService = { list: () => readStore<Review[]>('reviews', seedReviews) };
+export const reviewService = {
+  list: () => readStore<Review[]>('reviews', seedReviews),
+};
 export const categoryService = {
   list: () => readStore<Category[]>('categories', seedCategories),
   save: (categories: Category[]) => writeStore('categories', categories),
