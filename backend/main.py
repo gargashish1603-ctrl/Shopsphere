@@ -1,4 +1,3 @@
-# ShopSphere - Best Website & Marketplace Platform
 import json
 import uuid
 from datetime import datetime
