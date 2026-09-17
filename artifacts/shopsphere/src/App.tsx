@@ -271,7 +271,7 @@ function Header() {
 }
 function Toasts() { const { toasts, dismissToast } = useMarket(); return <div className="fixed bottom-5 right-5 z-50 grid gap-2">{toasts.map((t) => <div key={t.id} className="pop flex items-center gap-3 rounded-2xl bg-foreground px-4 py-3 text-sm text-background shadow-xl"><CircleCheck size={17} className={t.tone === 'error' ? 'text-destructive' : 'text-accent'} />{t.message}<button onClick={() => dismissToast(t.id)} aria-label="Dismiss notification"><X size={14} /></button></div>)}</div>; }
 function Shell({ children }: { children: React.ReactNode }) {
-  return <div className="grain min-h-[100dvh]"><Header /><main>{children}</main><Toasts /><footer className="mt-20 border-t border-border bg-secondary/40"><div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-9 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-8"><div><div className="serif text-lg font-bold text-foreground">ShopSphere</div><p className="mt-1">Good things, closer to home.</p></div><div className="flex gap-5"><Link href="/shop" className="hover:text-primary">Browse</Link><Link href="/seller" className="hover:text-primary">Start selling</Link><Link href="/profile" className="hover:text-primary">Account</Link></div><span className="mono text-xs">Made for India · 2025</span></div></footer></div>;
+  return <div className="grain min-h-[100dvh]"><Header /><main>{children}</main><Toasts /><footer className="mt-20 border-t border-border bg-secondary/40"><div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-9 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-8"><div><div className="serif text-lg font-bold text-foreground">ShopSphere</div><p className="mt-1">Good things, closer to home.</p></div><div className="flex gap-5"><Link href="/shop" className="hover:text-primary">Browse</Link><Link href="/seller" className="hover:text-primary">Start selling</Link><Link href="/profile" className="hover:text-primary">Account</Link></div><span className="mono text-xs">Made by Ashish Garg for India · 2026</span></div></footer></div>;
 }
 function Guard({ children, role }: { children: React.ReactNode; role?: 'admin' | 'user' | 'seller' | 'buyer' }) {
   const { user } = useMarket();
@@ -335,7 +335,6 @@ function Auth({ mode = 'login' }: { mode?: 'login' | 'register' }) {
   const { login, register } = useMarket();
   const [, setLocation] = useLocation();
   const isRegister = mode === 'register';
-  const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -350,7 +349,7 @@ function Auth({ mode = 'login' }: { mode?: 'login' | 'register' }) {
       return;
     }
     setLoading(true);
-    const result = isRegister ? await register(name.trim(), email, password, role) : await login(email, password, role);
+    const result = isRegister ? await register(name.trim(), email, password, 'buyer') : await login(email, password);
     setLoading(false);
 
     if (!result.ok) {
@@ -400,62 +399,23 @@ function Auth({ mode = 'login' }: { mode?: 'login' | 'register' }) {
             <span className="mono text-xs uppercase tracking-[.16em] text-accent">
               {isRegister ? 'Join the market' : 'Welcome back'}
             </span>
-            <h1 className="serif mt-2 text-4xl">
+            <h1 className="serif mt-2 text-4xl font-semibold">
               {isRegister ? 'Make yourself at home.' : 'Good to see you again.'}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              {isRegister ? 'Select your role and start your marketplace journey.' : 'Sign in as a Buyer or Seller to continue.'}
-            </p>
-          </div>
-
-          {/* Buyer / Seller Role Selector */}
-          <div className="mb-6">
-            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-              {isRegister ? 'I want to register as:' : 'I am signing in as:'}
-            </label>
-            <div className="grid grid-cols-2 gap-2 rounded-2xl bg-secondary/80 p-1.5 border border-border">
-              <button
-                type="button"
-                onClick={() => setRole('buyer')}
-                className={cn(
-                  'flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all',
-                  role === 'buyer'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <ShoppingCart size={17} className={role === 'buyer' ? 'text-primary' : ''} />
-                Buyer
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('seller')}
-                className={cn(
-                  'flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all',
-                  role === 'seller'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <Store size={17} className={role === 'seller' ? 'text-accent' : ''} />
-                Seller
-              </button>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {role === 'buyer'
-                ? '🛍️ Browse and buy unique handcrafted finds, track orders, and keep wishlists.'
-                : '📦 List your products, manage customer orders, and track sales revenue.'}
+              {isRegister ? 'Create an account to discover finds and start selling.' : 'Sign in to access your orders, shop, and account.'}
             </p>
           </div>
 
           <form onSubmit={submit} className="grid gap-4" noValidate>
             {isRegister && (
               <Field
-                label={role === 'seller' ? 'Store / Seller name' : 'Your name'}
+                label="Your full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={role === 'seller' ? 'Artisan Crafts Co.' : 'Priya Menon'}
+                placeholder="e.g. Priya Sharma"
                 autoComplete="name"
+                required
               />
             )}
             <Field
@@ -483,7 +443,7 @@ function Auth({ mode = 'login' }: { mode?: 'login' | 'register' }) {
             )}
 
             <Button type="submit" disabled={loading} className="mt-2 w-full py-3.5">
-              {loading ? 'Processing...' : isRegister ? `Create my ${role} account` : `Sign in as ${role}`} <ArrowRight size={16} />
+              {loading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'} <ArrowRight size={16} />
             </Button>
           </form>
 
