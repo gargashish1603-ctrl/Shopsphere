@@ -89,48 +89,46 @@ Before running the project locally, ensure you have:
 
 ---
 
-## ⚡ Quick Start Guide
+## ⚡ Quick Start Guide (Running on D: Drive)
+
+> 💡 **Recommended Directory**: `D:\ShopSphere-Marketplace` (Provides 170+ GB of free storage and contains the pre-configured virtual environment).
 
 ### 1. Running the Backend (FastAPI)
 
-Open a terminal window and navigate to the `backend` folder:
+Open a PowerShell terminal and run:
 
 ```powershell
-cd backend
-```
+# Step 1: Switch to D: Drive and enter backend folder
+D:
+cd \ShopSphere-Marketplace\backend
 
-#### Step 1: Create a Python virtual environment (if not already created)
-```powershell
-python -m venv venv
-```
+# Step 2: (One-time) Allow script execution in your PowerShell session
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-#### Step 2: Activate the virtual environment
-- **On Windows (PowerShell)**:
-  ```powershell
-  .\venv\Scripts\Activate.ps1
-  ```
-- **On Windows (Command Prompt)**:
-  ```cmd
-  .\venv\Scripts\activate.bat
-  ```
-- **On macOS / Linux**:
-  ```bash
-  source venv/bin/activate
-  ```
+# Step 3: Activate the virtual environment
+.\venv\Scripts\Activate.ps1
+# (You will see `(venv)` appear at the start of your prompt)
 
-#### Step 3: Install dependencies
-```powershell
+# Step 4: Install/update dependencies (fastapi, uvicorn, reportlab, etc.)
 pip install -r requirements.txt
-```
 
-#### Step 4: Start the FastAPI server
-```powershell
+# Step 5: Start the FastAPI server with auto-reload
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 The backend server is now running at:
 - **API Base**: `http://127.0.0.1:8000`
 - **Interactive Swagger Docs**: `http://127.0.0.1:8000/docs`
+
+#### 🛠️ Common Errors & How to Avoid Them:
+1. **`The term '.\venv\Scripts\Activate.ps1' is not recognized`**:
+   - **Cause**: You were on `C:\...` where `venv` wasn't created, or hadn't navigated to `D:\ShopSphere-Marketplace\backend`.
+   - **Fix**: Type `D:` and `cd \ShopSphere-Marketplace\backend`. If creating a new venv from scratch, run `python -m venv venv` first.
+2. **`ModuleNotFoundError: No module named 'fastapi'`**:
+   - **Cause**: You ran `uvicorn` without activating the `venv` first, causing Windows to fall back to your global Python (which doesn't have FastAPI installed).
+   - **Fix**: Ensure `(venv)` appears before running `uvicorn`, or invoke it directly using `.\venv\Scripts\python.exe -m uvicorn main:app --reload`.
+3. **`File ...\Activate.ps1 cannot be loaded because running scripts is disabled`**:
+   - **Fix**: Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` in PowerShell before activating.
 
 ---
 
